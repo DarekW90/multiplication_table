@@ -1,7 +1,7 @@
 <?php
     //start programu
     $start_date = date("H:i:s");
-    $start_time = time();
+    $start_time = microtime(true);
     echo "START " . $start_date . "<br>";
 ?>
 
@@ -44,7 +44,8 @@
 <?php
     //program stop
     $end_date = date("H:i:s");
-    $end_time = time();
-    echo "<h2>Różnica: " . (($end_time - $start_time) * 1000) . " sek.</h2>";
+    $end_time = microtime(true);
+    $diff_time = (($end_time - $start_time) * 1000);
+    echo "<h2>Różnica: " . $diff_time . " ms.</h2>";
     echo "END " . $end_date;
 ?>

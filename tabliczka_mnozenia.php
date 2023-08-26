@@ -1,14 +1,33 @@
 <?php
-    //start programu
-    $start_date = date("H:i:s");
-    $start_time = microtime(true);
-    echo "START " . $start_date . "<br>";
-?>
+    
+    $startTime = time();
+    $programStart = microtime(true);
+    $inFileNameSize = $_GET['size'];
 
-<?php
+    // tworzenie pliku cache i ustawienie jego lifetime
+    $cacheFile = "multiply_table_cache_".$inFileNameSize.".php";
+    $cacheTime = 10; // lifetime pliku cache
+
+    if (file_exists($cacheFile) && (filemtime($cacheFile) + $cacheTime > time()))
+    {
+        echo "Cache loaded!<br><br>";
+        readfile($cacheFile);
+        $programStop = microtime(true);
+        $diffTime = (($programStop - $programStart) * 1000);
+        echo "<h2>Różnica: " . $diffTime . " ms.</h2>";
+        exit();
+    }
+
+    ob_start();
+
+    //start programu
+
+    $startDate = date("H:i:s");
+    echo "START " . $startDate . "<br>";
+
     // funkcja budująca tabliczkę mnożenia JSON w oparciu o "size" podanym w URL strony
     function multiply_table($size) {
-        if (!is_numeric($size) || $size < 1 || $size > 10) {
+        if (!is_numeric($size) || $size < 1 || $size > 1000) {
             return json_encode(array("error" => "Wymiar tablicy musi być liczbą od 1 do 10."), JSON_UNESCAPED_UNICODE); // JSON_UNESCAPED_UNICODE umożliwia wyświetlenie polskich znaków w przypadku błędu podania wartości "size" poza wymaganą
         }
         // pętla tworząca tabliczkę mnożenia
@@ -39,13 +58,16 @@
     // wywoływanie rezultatu funkcji
     $result = multiply_table($size);
     echo $result;
-?>
 
-<?php
+    $file = fopen($cacheFile, "w");
+    fwrite($file,ob_get_contents());
+    fclose($file);
+
+
     //program stop
-    $end_date = date("H:i:s");
-    $end_time = microtime(true);
-    $diff_time = (($end_time - $start_time) * 1000);
-    echo "<h2>Różnica: " . $diff_time . " ms.</h2>";
-    echo "END " . $end_date;
+    $endDate = date("H:i:s");
+    $programStop = microtime(true);
+    $diffTime = (($programStop - $programStart) * 1000);
+    echo "<h2>Różnica: " . $diffTime . " ms.</h2>";
+    echo "Saving new cache"
 ?>

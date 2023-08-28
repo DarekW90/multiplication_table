@@ -26,3 +26,7 @@ Do wykonania zadania posługiwałem się:
 - stackify.com
 - chatGPT
 - YouTube file cashing, redis
+
+
+
+edit: wersje z try - catch dorobiłem z ciekawości jak bardzo wpływa to na szybkość działania program

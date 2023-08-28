@@ -28,8 +28,6 @@
         ob_start();
 
         // Start programu
-        $startDate = date("H:i:s");
-        echo "START " . $startDate . "<br><br>";
 
         function multiplyTable($size) {
             // Tworzenie tabliczki mnożenia

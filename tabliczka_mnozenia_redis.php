@@ -1,32 +1,41 @@
 <?php
 require 'vendor/autoload.php';
 
+// ustawienie połączenia z redis-server
 $redis = new Predis\Client([
     'scheme' => 'tcp',
     'host'   => '127.0.0.1',
     'port'   => 6379,
 ]);
 
+// pobranie parametru size
 $size = isset($_GET['size']) ? $_GET['size'] : '';
 
+// połączenie z redis
 $connected = $redis->ping();
 $cachedResult = $redis->get(('key'.$size));
+
+// zapisanie czasu startu programu
 $programStart = microtime(true);
 
+// sprawdzenie czy program ma połączenie z redis
 if ($connected) {
     echo "<b>Połączenie z Redis zostało poprawnie nawiązane.</b><br>";
     if (ctype_digit($size) && $size >= 1 && $size <= 100) {
         if ($cachedResult) {
+
+            // wczytanie wyników z cache
             echo "<br>Wyniki z pamięci podręcznej Redis!<br><br>";
             $programStop = microtime(true);
+            // czas programu w przypadku wczytania danych z pamięci ram
             $diffTime = (($programStop - $programStart) * 1000);
             echo "<h2>Różnica: " . round($diffTime, 4) . " ms.</h2>";
             echo $cachedResult;
             exit();
         }
 
+        // funkcja budująca tabliczkę mnożenia
         function multiplyTable($size) {
-
             $result = array();
             for ($i = 1; $i <= $size; $i++) {
                 $row = array();
@@ -35,11 +44,11 @@ if ($connected) {
                 }
                 $result[$i] = $row;
             }
-
             return json_encode($result, JSON_UNESCAPED_UNICODE);
         }
 
         $result = multiplyTable($size);
+        // zapis do redis-server oraz ustawienie TTL na 10sekund
         $redis->setex('key'.$size, 10 ,$result);
         $wartosc = $redis->get('key'.$size);
 
@@ -47,13 +56,15 @@ if ($connected) {
         $programStop = microtime(true);
         $diffTime = (($programStop - $programStart) * 1000);
 
+        // różnica czasu w przypadku generowania oraz zapisywania pliku
         echo "<h2>Różnica czasu: " . round($diffTime, 4) . " ms.</h2>";
         echo $wartosc;
+        
     } else {
         echo "<b>Parametr 'size' nie został ustawiony w adresie URL lub jest niepoprawny.</b><br><br> Należy dopisać w adresie URL - ?size=(1-100)";
     }
     
 } else {
-    echo "Nie udało się nawiązać połączenia z Redis.";
+    echo "<b><br>Nie udało się nawiązać połączenia z Redis.</b>";
 }
 ?>

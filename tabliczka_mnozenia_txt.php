@@ -3,7 +3,7 @@
     $startTime = time();
     $programStart = microtime(true);
 
-    // super globalna $_GET pobiera "size" z adresu URL strony
+    // Super globalna $_GET pobiera "size" z adresu URL strony
     $size = isset($_GET['size']) ? $_GET['size'] : '';
 
     // Sprawdzenie czy parametr "size" jest ustawiony i jest liczbą całkowitą
@@ -24,7 +24,7 @@
             echo "Cache loaded!";
             exit();
         }
-            
+
         ob_start();
 
         // Start programu
